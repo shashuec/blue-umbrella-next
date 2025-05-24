@@ -70,10 +70,10 @@ const ReviewPage = () => {
         <div className="w-full max-w-md space-y-8">
           <div>
             <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-              AI-Powered Portfolio Review
+              AI-Powered Mutual Fund Portfolio Review
             </h2>
             <p className="mt-2 text-center text-sm text-gray-600">
-              Get a free expert analysis of your current investment portfolio using our advanced AI technology
+              Get a free expert analysis of your current mutual fund investment portfolio using our advanced AI technology
             </p>
           </div>
 
