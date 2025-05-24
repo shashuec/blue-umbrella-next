@@ -1,23 +1,70 @@
 "use client";
 
 import React, { useState } from "react";
-import Link from "next/link";
-import { Button } from "../../components/ui/button";
-import { Card } from "../../components/ui/card";
-import Navigation from "../../components/Navigation";
-import Footer from "../../components/Footer";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import Navigation from "@/components/Navigation";
+import Footer from "@/components/Footer";
+import { FileUploadStep } from "@/components/review/FileUploadStep";
+import { PhoneVerificationStep } from "@/components/review/PhoneVerificationStep";
+import { OTPInputStep } from "@/components/review/OTPInputStep";
+import { InsightsProgress } from "@/components/review/InsightsProgress";
+import { InsightsResult } from "@/components/review/InsightsResult";
+import { startAnalysis } from "@/lib/api";
+import { PortfolioAnalysis } from "@/types/api";
 
 const ReviewPage = () => {
   // Define the steps in the review process
   const STEPS = {
     UPLOAD: 0,
-    UPLOADING: 1,
-    PHONE: 2,
-    OTP: 3,
-    CONFIRMATION: 4,
+    PHONE: 1,
+    OTP: 2,
+    PROCESSING: 3,
+    RESULT: 4,
   };
   
   const [step, setStep] = useState(STEPS.UPLOAD);
+  const [uploadId, setUploadId] = useState<string | null>(null);
+  const [analysisId, setAnalysisId] = useState<string | null>(null);
+  const [phoneNumber, setPhoneNumber] = useState<string>("");
+  const [portfolio, setPortfolio] = useState<File | null>(null);
+  const [insights, setInsights] = useState<PortfolioAnalysis | null>(null);
+  
+  // Handler for successful file upload
+  const handleFileUploaded = (id: string, file: File) => {
+    setUploadId(id);
+    setPortfolio(file);
+    setStep(STEPS.PHONE);
+  };
+  
+  // Handler for phone verification
+  const handlePhoneVerified = (phone: string) => {
+    setPhoneNumber(phone);
+    setStep(STEPS.OTP);
+  };
+  
+  // Handler for OTP verification and process start
+  const handleOTPVerified = async () => {
+    try {
+      if (!uploadId) {
+        toast.error("No portfolio uploaded");
+        return;
+      }
+      const result = await startAnalysis(uploadId);
+      setAnalysisId(result.analysisId);
+      setStep(STEPS.PROCESSING);
+    } catch (error) {
+      toast.error(`Failed to start analysis: ${error instanceof Error ? error.message : "Unknown error"}`);
+      console.error("Error starting portfolio analysis:", error);
+    }
+  };
+  
+  // Handler for analysis completion
+  const handleAnalysisComplete = (result: PortfolioAnalysis) => {
+    setInsights(result);
+    setStep(STEPS.RESULT);
+  };
   
   return (
     <div className="min-h-screen flex flex-col">
@@ -27,50 +74,58 @@ const ReviewPage = () => {
         <div className="w-full max-w-md space-y-8">
           <div>
             <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-              Portfolio Review
+              AI-Powered Portfolio Review
             </h2>
             <p className="mt-2 text-center text-sm text-gray-600">
-              Get a free expert analysis of your current investment portfolio
+              Get a free expert analysis of your current investment portfolio using our advanced AI technology
             </p>
           </div>
 
           <Card className="p-6 bg-white shadow-md rounded-lg">
             <div className="space-y-6">
-              <h3 className="text-lg font-medium text-gray-900">Upload your portfolio</h3>
-              <p className="text-sm text-gray-500">
-                Please upload your investment portfolio statement as a PDF file (max 10MB)
-              </p>
+              {step === STEPS.UPLOAD && (
+                <FileUploadStep onFileUploaded={handleFileUploaded} />
+              )}
               
-              {/* Upload box will go here in the full implementation */}
-              <div className="border-2 border-dashed rounded-lg p-8 text-center hover:border-blue-500 transition-colors border-gray-300">
-                <div className="space-y-2">
-                  <svg className="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
-                    <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              {step === STEPS.PHONE && (
+                <PhoneVerificationStep 
+                  uploadId={uploadId!}
+                  onPhoneVerified={handlePhoneVerified}
+                  onBack={() => setStep(STEPS.UPLOAD)}
+                />
+              )}
+              
+              {step === STEPS.OTP && (
+                <OTPInputStep
+                  phoneNumber={phoneNumber}
+                  uploadId={uploadId!}
+                  onOTPVerified={handleOTPVerified}
+                  onBack={() => setStep(STEPS.PHONE)}
+                />
+              )}
+              
+              {step === STEPS.PROCESSING && analysisId && (
+                <InsightsProgress
+                  uploadId={analysisId}
+                  onComplete={handleAnalysisComplete}
+                />
+              )}
+              
+              {step === STEPS.RESULT && insights && (
+                <InsightsResult
+                  insights={insights}
+                  onRestart={() => setStep(STEPS.UPLOAD)}
+                />
+              )}
+              
+              <div className="mt-2 text-center">
+                <span className="inline-flex items-center bg-blue-50 text-blue-700 text-xs font-medium px-2.5 py-0.5 rounded-full">
+                  <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"></path>
                   </svg>
-                  <div className="flex text-sm text-gray-600 justify-center">
-                    <label
-                      htmlFor="file-upload"
-                      className="relative cursor-pointer rounded-md font-medium text-blue-600 hover:text-blue-500"
-                    >
-                      <span>Upload a file</span>
-                      <input
-                        id="file-upload"
-                        name="file-upload"
-                        type="file"
-                        className="sr-only"
-                      />
-                    </label>
-                    <p className="pl-1">or drag and drop</p>
-                  </div>
-                  <p className="text-xs text-gray-500">PDF up to 10MB</p>
-                </div>
+                  Powered by advanced AI technology
+                </span>
               </div>
-              
-              <Link href="/">
-                <Button className="w-full">
-                  Continue
-                </Button>
-              </Link>
             </div>
           </Card>
         </div>

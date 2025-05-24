@@ -1,3 +1,5 @@
+"use client";
+
 import React from 'react';
 
 const Footer: React.FC = () => {
@@ -6,24 +8,24 @@ const Footer: React.FC = () => {
       <div className="container mx-auto px-4">
         <div className="max-w-5xl mx-auto">
           <div className="mb-8 text-center">
-            <div className="flex items-center justify-center gap-2 mb-4">
+            <a href="/" className="flex items-center justify-center gap-2 mb-4">
               <div className="h-8 w-8 rounded-full bg-blueumbrella-700 flex items-center justify-center">
                 <span className="text-white text-sm font-bold">B</span>
               </div>
               <span className="text-lg font-bold text-blueumbrella-800">Blue Umbrella</span>
-            </div>
+            </a>
             
             <div className="flex flex-col sm:flex-row justify-center gap-4 sm:gap-8 mb-8">
-              <a href="#why-us" className="text-gray-600 hover:text-blueumbrella-700 transition-colors text-sm">
+              <a href="/#why-us" className="text-gray-600 hover:text-blueumbrella-700 transition-colors text-sm">
                 Why Choose Us
               </a>
-              <a href="#how-it-works" className="text-gray-600 hover:text-blueumbrella-700 transition-colors text-sm">
+              <a href="/#how-it-works" className="text-gray-600 hover:text-blueumbrella-700 transition-colors text-sm">
                 How It Works
               </a>
-              <a href="#testimonials" className="text-gray-600 hover:text-blueumbrella-700 transition-colors text-sm">
+              <a href="/#testimonials" className="text-gray-600 hover:text-blueumbrella-700 transition-colors text-sm">
                 Testimonials
               </a>
-              <a href="#faqs" className="text-gray-600 hover:text-blueumbrella-700 transition-colors text-sm">
+              <a href="/#faqs" className="text-gray-600 hover:text-blueumbrella-700 transition-colors text-sm">
                 FAQs
               </a>
             </div>

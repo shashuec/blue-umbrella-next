@@ -1,3 +1,5 @@
+"use client";
+
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -34,12 +36,12 @@ const Navigation = () => {
       isScrolled ? "bg-white/90 backdrop-blur-md shadow-sm" : "bg-transparent"
     )}>
       <div className="container mx-auto px-4 sm:px-6 flex items-center justify-between">
-        <div className="flex items-center gap-2">
+        <a href="/" className="flex items-center gap-2">
           <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-full bg-blueumbrella-700 flex items-center justify-center">
             <span className="text-white text-lg sm:text-xl font-bold">B</span>
           </div>
           <span className="text-lg sm:text-xl font-bold text-blueumbrella-800">Blue Umbrella</span>
-        </div>
+        </a>
         
         {/* Mobile Menu Button */}
         <button
@@ -56,20 +58,22 @@ const Navigation = () => {
 
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center gap-6 lg:gap-8">
-          <a href="#why-us" className="text-blueumbrella-800 hover:text-blueumbrella-600 transition-colors text-sm lg:text-base">
+          <a href="/#why-us" className="text-blueumbrella-800 hover:text-blueumbrella-600 transition-colors text-sm lg:text-base">
             Why Choose Us
           </a>
-          <a href="#how-it-works" className="text-blueumbrella-800 hover:text-blueumbrella-600 transition-colors text-sm lg:text-base">
+          <a href="/#how-it-works" className="text-blueumbrella-800 hover:text-blueumbrella-600 transition-colors text-sm lg:text-base">
             How It Works
           </a>
-          <a href="#testimonials" className="text-blueumbrella-800 hover:text-blueumbrella-600 transition-colors text-sm lg:text-base">
+          <a href="/#testimonials" className="text-blueumbrella-800 hover:text-blueumbrella-600 transition-colors text-sm lg:text-base">
             Testimonials
           </a>
-          <Button 
-            className="bg-blueumbrella-700 hover:bg-blueumbrella-800 text-white text-sm lg:text-base"
-          >
-            Get My Free Report
-          </Button>
+          <a href="/review">
+            <Button 
+              className="bg-blueumbrella-700 hover:bg-blueumbrella-800 text-white text-sm lg:text-base"
+            >
+              Get My Free AI Report
+            </Button>
+          </a>
         </div>
 
         {/* Mobile Navigation */}
@@ -86,31 +90,36 @@ const Navigation = () => {
               <X className="h-6 w-6 text-blueumbrella-800" />
             </button>
             <a 
-              href="#why-us" 
+              href="/#why-us" 
               className="text-lg sm:text-xl text-blueumbrella-800 hover:text-blueumbrella-600 transition-colors"
               onClick={() => setIsMobileMenuOpen(false)}
             >
               Why Choose Us
             </a>
             <a 
-              href="#how-it-works" 
+              href="/#how-it-works" 
               className="text-lg sm:text-xl text-blueumbrella-800 hover:text-blueumbrella-600 transition-colors"
               onClick={() => setIsMobileMenuOpen(false)}
             >
               How It Works
             </a>
             <a 
-              href="#testimonials" 
+              href="/#testimonials" 
               className="text-lg sm:text-xl text-blueumbrella-800 hover:text-blueumbrella-600 transition-colors"
               onClick={() => setIsMobileMenuOpen(false)}
             >
               Testimonials
             </a>
-            <Button 
-              className="bg-blueumbrella-700 hover:bg-blueumbrella-800 text-white mt-4"
+            <a 
+              href="/review" 
+              onClick={() => setIsMobileMenuOpen(false)}
             >
-              Get My Free Report
-            </Button>
+              <Button 
+                className="bg-blueumbrella-700 hover:bg-blueumbrella-800 text-white mt-4"
+              >
+                Get My Free AI Report
+              </Button>
+            </a>
           </div>
         </div>
       </div>

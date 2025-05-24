@@ -18,8 +18,8 @@ const CTA: React.FC = () => {
             <Button 
               className="bg-white text-blueumbrella-800 hover:bg-gray-100 px-4 sm:px-6 py-4 sm:py-5 text-base sm:text-lg rounded-xl w-full md:w-auto font-semibold max-w-xs mx-auto whitespace-normal break-words"
             >
-              <a href="https://wa.me/918076018082?text=Hi%2C%20I%20would%20like%20a%20free%20portfolio%20review%20from%20Blue%20Umbrella." target="_blank" rel="noopener noreferrer" className="block w-full h-full">
-                Start My Free Portfolio Review
+              <a href="/review" className="block w-full h-full">
+                Start My Free AI Portfolio Analysis
               </a>
             </Button>
           </div>

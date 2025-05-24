@@ -1,0 +1,166 @@
+"use client";
+
+import React, { useEffect, useRef } from "react";
+import { useForm } from "react-hook-form";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { useMutation } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { verifyOTP } from "@/lib/api";
+
+interface OTPInputStepProps {
+  onOTPVerified: () => Promise<void>;
+  uploadId: string;
+  phoneNumber: string;
+  onBack: () => void;
+}
+
+interface FormValues {
+  otp: string[];
+}
+
+export const OTPInputStep: React.FC<OTPInputStepProps> = ({ onOTPVerified, uploadId, phoneNumber, onBack }) => {
+  const { register, handleSubmit, formState: { errors }, setValue, getValues } = useForm<FormValues>({
+    defaultValues: {
+      otp: ["", "", "", ""]
+    }
+  });
+  
+  const inputRefs = [
+    useRef<HTMLInputElement>(null),
+    useRef<HTMLInputElement>(null),
+    useRef<HTMLInputElement>(null),
+    useRef<HTMLInputElement>(null),
+  ];
+  
+  // OTP verification mutation
+  const otpVerificationMutation = useMutation({
+    mutationFn: (otp: string) => verifyOTP(otp, uploadId, phoneNumber),
+    onSuccess: async () => {
+      toast.success("Phone number verified");
+      await onOTPVerified();
+    },
+    onError: (error) => {
+      toast.error(`Verification failed: ${error instanceof Error ? error.message : "Unknown error"}`);
+    }
+  });
+  
+  const onSubmit = (data: FormValues) => {
+    const otp = data.otp.join("");
+    otpVerificationMutation.mutate(otp);
+  };
+  
+  // Handle input changes and auto-focus next input
+  const handleOtpChange = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
+    const value = e.target.value;
+    
+    // Allow only one digit
+    if (value && !/^\d*$/.test(value)) {
+      return;
+    }
+    
+    // Update the form state
+    const newOtp = [...getValues("otp")];
+    newOtp[index] = value.substr(-1); // Take only the last character if multiple are pasted
+    setValue("otp", newOtp);
+    
+    // Auto-focus next input when a digit is entered
+    if (value && index < 3) {
+      inputRefs[index + 1].current?.focus();
+    }
+  };
+  
+  // Handle backspace key to move to previous input
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, index: number) => {
+    if (e.key === "Backspace" && !getValues("otp")[index] && index > 0) {
+      inputRefs[index - 1].current?.focus();
+    }
+  };
+  
+  // Handle paste event to distribute digits across inputs
+  const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    const pastedData = e.clipboardData.getData("text/plain").trim();
+    
+    // Only proceed if pasted content is numeric and has a reasonable length
+    if (!/^\d*$/.test(pastedData)) return;
+    
+    const digits = pastedData.split("").slice(0, 4);
+    const newOtp = [...getValues("otp")];
+    
+    digits.forEach((digit, index) => {
+      if (index < 4) {
+        newOtp[index] = digit;
+      }
+    });
+    
+    setValue("otp", newOtp);
+    
+    // Focus the next empty input or the last input
+    const nextEmptyIndex = newOtp.findIndex(val => !val);
+    const focusIndex = nextEmptyIndex === -1 ? 3 : nextEmptyIndex;
+    inputRefs[focusIndex].current?.focus();
+  };
+  
+  // Focus first input on mount
+  useEffect(() => {
+    inputRefs[0].current?.focus();
+  }, []);
+  
+  return (
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+      <h3 className="text-lg font-medium text-gray-900">Enter Verification Code</h3>
+      <p className="text-sm text-gray-500">
+        We've sent a verification code to {phoneNumber}
+      </p>
+      
+      <div className="flex justify-center gap-2">
+        {[0, 1, 2, 3].map((idx) => (
+          <Input
+            key={idx}
+            type="text"
+            maxLength={1}
+            className="w-12 h-12 text-center text-lg"
+            {...register(`otp.${idx}`)}
+            ref={(el) => {
+              const { ref } = register(`otp.${idx}`);
+              // Assign both refs
+              if (typeof ref === "function") ref(el);
+              inputRefs[idx].current = el;
+            }}
+            onChange={(e) => handleOtpChange(e, idx)}
+            onKeyDown={(e) => handleKeyDown(e, idx)}
+            onPaste={handlePaste}
+          />
+        ))}
+      </div>
+      
+      {errors.otp && (
+        <p className="text-sm text-red-500 text-center">Please enter all 4 digits</p>
+      )}
+      
+      <div className="text-center text-sm text-gray-600">
+        <p>Didn't receive a code? <button type="button" className="text-blue-600 hover:text-blue-800" onClick={() => toast.info("Resend feature will be implemented")}>Resend</button></p>
+      </div>
+      
+      <div className="space-y-2">
+        <Button 
+          type="submit" 
+          className="w-full" 
+          disabled={otpVerificationMutation.isPending || getValues("otp").some(digit => !digit)}
+        >
+          {otpVerificationMutation.isPending ? "Verifying..." : "Verify & Continue"}
+        </Button>
+        
+        <Button
+          type="button"
+          className="w-full"
+          variant="outline"
+          onClick={onBack}
+        >
+          Back
+        </Button>
+      </div>
+    </form>
+  );
+};

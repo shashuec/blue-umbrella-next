@@ -12,11 +12,11 @@ const Hero: React.FC = () => {
       <div className="container mx-auto px-4 sm:px-6 py-12 sm:py-16 md:py-20 pt-20 sm:pt-24 md:pt-20 relative z-10">
         <div className="max-w-3xl mx-auto text-center">
           <h1 className="animate-fade-in text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-blueumbrella-900 leading-tight mb-4 sm:mb-6">
-            Expert Mutual Fund Management for Your Financial Growth
+            AI-Powered Mutual Fund Management for Your Financial Growth
           </h1>
           
           <p className="animate-fade-in animate-delay-200 text-base sm:text-lg md:text-xl text-gray-600 mb-6 sm:mb-8">
-            Grow your wealth into tomorrow&apos;s dreams with our professional mutual fund portfolio management—hands-off, worry-free.
+            Grow your wealth into tomorrow&apos;s dreams with our AI-enhanced mutual fund portfolio management—hands-off, worry-free.
           </p>
           
           <a
@@ -24,7 +24,7 @@ const Hero: React.FC = () => {
             className="block w-full sm:w-auto"
           >
             <Button className="animate-fade-in animate-delay-300 bg-blueumbrella-700 hover:bg-blueumbrella-800 text-white px-4 sm:px-6 py-3 sm:py-4 md:py-5 text-sm sm:text-base md:text-lg rounded-xl w-full sm:w-auto max-w-xs mx-auto whitespace-normal break-words flex items-center justify-center">
-              Start My Free Portfolio Review
+              Start My Free AI Portfolio Review
             </Button>
           </a>
           
