@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { updateAnalysisStatus } from '../status/route';
+import { updateAnalysisStatus } from '@/lib/analysisStore';
 import { v4 as uuidv4 } from 'uuid';
 
 // In a real implementation, we would use a database

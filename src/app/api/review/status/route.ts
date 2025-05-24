@@ -1,32 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-
-// In-memory storage for analysis statuses
-// In a production environment, this would be replaced with a database
-interface AnalysisStatus {
-  id: string;
-  status: 'pending' | 'processing' | 'completed' | 'failed';
-  progress: number;
-  result?: { stage?: string; insights?: { 
-    summary: string;
-    currentValue: number;
-    annualReturn: number;
-    riskLevel: string;
-    assetCount: number;
-    recommendations: string[];
-    allocation: {
-      equity: number;
-      debt: number;
-      gold: number;
-      others: number;
-    };
-  }};
-  error?: string;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-// Temporary in-memory store
-const analysisStore: Record<string, AnalysisStatus> = {};
+import { updateAnalysisStatus } from '@/lib/analysisStore';
 
 export async function GET(request: NextRequest) {
   try {
@@ -40,7 +13,8 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const analysis = analysisStore[id];
+    // Use updateAnalysisStatus to ensure the analysis exists, but don't update anything
+    const analysis = updateAnalysisStatus(id, {});
 
     if (!analysis) {
       return NextResponse.json(
@@ -68,8 +42,6 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// For testing/demo purposes, this function allows setting a status
-// In production, this would be part of a queue processing system
 export async function POST(request: NextRequest) {
   try {
     const data = await request.json();
@@ -82,34 +54,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Create or update the analysis status
-    if (!analysisStore[id]) {
-      analysisStore[id] = {
-        id,
-        status: status || 'pending',
-        progress: progress || 0,
-        result,
-        error,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
-    } else {
-      analysisStore[id] = {
-        ...analysisStore[id],
-        status: status || analysisStore[id].status,
-        progress: progress !== undefined ? progress : analysisStore[id].progress,
-        result: result || analysisStore[id].result,
-        error: error || analysisStore[id].error,
-        updatedAt: new Date(),
-      };
-    }
+    // Use updateAnalysisStatus to create or update the analysis
+    const updated = updateAnalysisStatus(id, { status, progress, result, error });
 
     return NextResponse.json({
       success: true,
       data: {
         id,
-        status: analysisStore[id].status,
-        progress: analysisStore[id].progress,
+        status: updated.status,
+        progress: updated.progress,
       },
     });
   } catch (error) {
@@ -119,28 +72,4 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
-}
-
-// Helper function to be exported and used by other API routes
-export function updateAnalysisStatus(
-  id: string, 
-  updates: Partial<Omit<AnalysisStatus, 'id' | 'createdAt' | 'updatedAt'>>
-) {
-  if (!analysisStore[id]) {
-    analysisStore[id] = {
-      id,
-      status: 'pending',
-      progress: 0,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-  }
-
-  analysisStore[id] = {
-    ...analysisStore[id],
-    ...updates,
-    updatedAt: new Date(),
-  };
-
-  return analysisStore[id];
 }
