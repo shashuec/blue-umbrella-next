@@ -1,8 +1,7 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { ButtonProps } from "@/components/ui/button";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { verifyOTP } from "@/lib/api";
@@ -130,7 +129,7 @@ export const OTPInputStep = ({ phoneNumber, uploadId, onOTPVerified, onBack }: O
         </div>
 
         <p className="text-center text-sm text-gray-600">
-          Didn't receive the code?{' '}
+          Didn&apos;t receive the code?{' '}
           <button 
             className="text-blue-600 hover:text-blue-800 font-medium disabled:opacity-50"
             disabled={otpVerificationMutation.isPending}

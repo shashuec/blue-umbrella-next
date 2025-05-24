@@ -13,7 +13,7 @@ interface InsightsProgressProps {
 
 export const InsightsProgress = ({ uploadId, onComplete }: InsightsProgressProps) => {
   // Query to poll the status of the AI analysis
-  const { data, error, isError, isLoading } = useQuery<ApiResponse<AnalysisData>, Error>({
+  const { data, error, isError } = useQuery<ApiResponse<AnalysisData>, Error>({
     queryKey: ["portfolio-status", uploadId],
     queryFn: () => checkAnalysisStatus(uploadId),
     refetchInterval: (query) => {

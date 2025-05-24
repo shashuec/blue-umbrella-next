@@ -66,7 +66,7 @@ export const PhoneVerificationStep = ({ onPhoneVerified, uploadId, onBack }: Pho
       <div className="text-center">
         <h3 className="text-lg font-medium text-gray-900">Verify Your Phone</h3>
         <p className="mt-2 text-sm text-gray-600">
-          We'll send a verification code to your phone
+          We&apos;ll send a verification code to your phone
         </p>
       </div>
 

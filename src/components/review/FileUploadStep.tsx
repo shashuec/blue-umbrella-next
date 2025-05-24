@@ -6,16 +6,9 @@ import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { uploadPortfolio } from "@/lib/api";
-import { ApiResponse } from "@/types/api";
 
 interface FileUploadStepProps {
   onFileUploaded: (uploadId: string, file: File) => void;
-}
-
-interface FileUploadResponse {
-  uploadId: string;
-  filename: string;
 }
 
 interface FormValues {
