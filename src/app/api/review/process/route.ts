@@ -6,7 +6,7 @@ import { v4 as uuidv4 } from 'uuid';
 // For this demo, we'll use the same in-memory store from the upload route
 // This should be in a shared file or database in production
 declare const uploadStore: Record<string, {
-  fileData: any,
+  fileData: unknown,
   timestamp: number,
   phoneNumber?: string,
   verified?: boolean,
@@ -133,7 +133,7 @@ export async function POST(request: NextRequest) {
             updateAnalysisStatus(analysisId, {
               status: 'completed',
               progress: 100,
-              result: insights
+              result: { insights }
             });
             
             // Update upload store as well

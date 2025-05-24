@@ -6,7 +6,20 @@ interface AnalysisStatus {
   id: string;
   status: 'pending' | 'processing' | 'completed' | 'failed';
   progress: number;
-  result?: any;
+  result?: { stage?: string; insights?: { 
+    summary: string;
+    currentValue: number;
+    annualReturn: number;
+    riskLevel: string;
+    assetCount: number;
+    recommendations: string[];
+    allocation: {
+      equity: number;
+      debt: number;
+      gold: number;
+      others: number;
+    };
+  }};
   error?: string;
   createdAt: Date;
   updatedAt: Date;

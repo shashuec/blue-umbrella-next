@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 // In a real implementation, we would use a service like AWS S3 to store the file
 // For this demo, we'll simulate storage with an in-memory object
 const uploadStore: Record<string, { 
-  fileData: any, 
+  fileData: unknown, 
   timestamp: number,
   phoneNumber?: string,
   verified?: boolean,

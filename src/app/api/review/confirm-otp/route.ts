@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 // For this demo, we'll use the same in-memory store from the upload route
 // This should be in a shared file or database in production
 declare const uploadStore: Record<string, {
-  fileData: any,
+  fileData: unknown,
   timestamp: number,
   phoneNumber?: string,
   verified?: boolean,
