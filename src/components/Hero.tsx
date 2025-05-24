@@ -20,9 +20,7 @@ const Hero: React.FC = () => {
           </p>
           
           <a
-            href="https://wa.me/918076018082?text=Hi%2C%20I%20would%20like%20a%20free%20portfolio%20review%20from%20Blue%20Umbrella."
-            target="_blank"
-            rel="noopener noreferrer"
+            href="/review"
             className="block w-full sm:w-auto"
           >
             <Button className="animate-fade-in animate-delay-300 bg-blueumbrella-700 hover:bg-blueumbrella-800 text-white px-4 sm:px-6 py-3 sm:py-4 md:py-5 text-sm sm:text-base md:text-lg rounded-xl w-full sm:w-auto max-w-xs mx-auto whitespace-normal break-words flex items-center justify-center">
