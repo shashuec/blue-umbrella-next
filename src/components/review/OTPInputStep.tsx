@@ -88,7 +88,7 @@ export const OTPInputStep = ({ phoneNumber, uploadId, onOTPVerified, onBack }: O
       <div className="text-center">
         <h3 className="text-lg font-medium text-gray-900">Enter Verification Code</h3>
         <p className="mt-2 text-sm text-gray-600">
-          We've sent a 6-digit code to {phoneNumber}
+          We&apos;ve sent a 6-digit code to {phoneNumber}
         </p>
       </div>
 

@@ -30,7 +30,7 @@ const ReviewPage = () => {
   const [insights, setInsights] = useState<PortfolioAnalysis | null>(null);
   
   // Handler for successful file upload
-  const handleFileUploaded = (id: string, file: File) => {
+  const handleFileUploaded = (id: string) => {
     setUploadId(id);
     setStep(STEPS.PHONE);
   };

@@ -68,8 +68,8 @@ export const FileUploadStep: React.FC<FileUploadStepProps> = ({ onFileUploaded }
       const fileFromForm = getValues("file")[0];
       onFileUploaded(data.data.uploadId, fileFromForm);
     },
-    onError: (error) => {
-      toast.error(`Upload failed: ${error instanceof Error ? error.message : "Unknown error"}`);
+    onError: () => {
+      toast.error(`Upload failed`);
       setUploadProgress(0);
     }
   });
