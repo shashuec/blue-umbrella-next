@@ -4,7 +4,6 @@ import React, { useState } from "react";
 import { toast } from "sonner";
 import { Card } from "@/components/ui/card";
 import Navigation from "@/components/Navigation";
-import Footer from "@/components/Footer";
 import { FileUploadStep } from "@/components/review/FileUploadStep";
 import { PhoneVerificationStep } from "@/components/review/PhoneVerificationStep";
 import { OTPInputStep } from "@/components/review/OTPInputStep";
@@ -128,7 +127,7 @@ const ReviewPage = () => {
         </div>
       </main>
       
-      <Footer />
+      {/* <Footer /> removed to prevent duplicate rendering; it is already in the layout */}
     </div>
   );
 };

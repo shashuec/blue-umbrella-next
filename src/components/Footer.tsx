@@ -32,8 +32,8 @@ const Footer: React.FC = () => {
             </div>
             {/* Contact info for mobile */}
             <div className="flex flex-col items-center gap-2 text-sm text-gray-500 mb-8">
-              <span>Whatsapp: <a href="tel:+918076018082" className="underline">+91 8076 018 082</a></span>
-              <span>Prateek: <a href="tel:+919818278054" className="underline">+91 98182 78054</a></span>
+              <span>Whatsapp: <a href="https://wa.me/918076018082" className="underline" target="_blank" rel="noopener noreferrer">+91 8076 018 082</a></span>
+              <span>Prateek: <a href="https://wa.me/919818278054" className="underline" target="_blank" rel="noopener noreferrer">+91 98182 78054</a></span>
             </div>
           </div>
           
