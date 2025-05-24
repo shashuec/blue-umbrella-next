@@ -1,6 +1,7 @@
 "use client";
 
 import React from 'react';
+import Link from 'next/link';
 
 const Footer: React.FC = () => {
   return (
@@ -8,26 +9,26 @@ const Footer: React.FC = () => {
       <div className="container mx-auto px-4">
         <div className="max-w-5xl mx-auto">
           <div className="mb-8 text-center">
-            <a href="/" className="flex items-center justify-center gap-2 mb-4">
+            <Link href="/" className="flex items-center justify-center gap-2 mb-4">
               <div className="h-8 w-8 rounded-full bg-blueumbrella-700 flex items-center justify-center">
                 <span className="text-white text-sm font-bold">B</span>
               </div>
               <span className="text-lg font-bold text-blueumbrella-800">Blue Umbrella</span>
-            </a>
+            </Link>
             
             <div className="flex flex-col sm:flex-row justify-center gap-4 sm:gap-8 mb-8">
-              <a href="/#why-us" className="text-gray-600 hover:text-blueumbrella-700 transition-colors text-sm">
+              <Link href="/#why-us" className="text-gray-600 hover:text-blueumbrella-700 transition-colors text-sm">
                 Why Choose Us
-              </a>
-              <a href="/#how-it-works" className="text-gray-600 hover:text-blueumbrella-700 transition-colors text-sm">
+              </Link>
+              <Link href="/#how-it-works" className="text-gray-600 hover:text-blueumbrella-700 transition-colors text-sm">
                 How It Works
-              </a>
-              <a href="/#testimonials" className="text-gray-600 hover:text-blueumbrella-700 transition-colors text-sm">
+              </Link>
+              <Link href="/#testimonials" className="text-gray-600 hover:text-blueumbrella-700 transition-colors text-sm">
                 Testimonials
-              </a>
-              <a href="/#faqs" className="text-gray-600 hover:text-blueumbrella-700 transition-colors text-sm">
+              </Link>
+              <Link href="/#faqs" className="text-gray-600 hover:text-blueumbrella-700 transition-colors text-sm">
                 FAQs
-              </a>
+              </Link>
             </div>
             {/* Contact info for mobile */}
             <div className="flex flex-col items-center gap-2 text-sm text-gray-500 mb-8">

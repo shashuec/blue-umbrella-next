@@ -2,7 +2,6 @@
 
 import React, { useState } from "react";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
@@ -28,13 +27,11 @@ const ReviewPage = () => {
   const [uploadId, setUploadId] = useState<string | null>(null);
   const [analysisId, setAnalysisId] = useState<string | null>(null);
   const [phoneNumber, setPhoneNumber] = useState<string>("");
-  const [portfolio, setPortfolio] = useState<File | null>(null);
   const [insights, setInsights] = useState<PortfolioAnalysis | null>(null);
   
   // Handler for successful file upload
   const handleFileUploaded = (id: string, file: File) => {
     setUploadId(id);
-    setPortfolio(file);
     setStep(STEPS.PHONE);
   };
   

@@ -4,6 +4,7 @@ import React from 'react';
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Menu, X } from 'lucide-react';
+import Link from 'next/link';
 
 const Navigation = () => {
   const [isScrolled, setIsScrolled] = React.useState(false);
@@ -36,12 +37,12 @@ const Navigation = () => {
       isScrolled ? "bg-white/90 backdrop-blur-md shadow-sm" : "bg-transparent"
     )}>
       <div className="container mx-auto px-4 sm:px-6 flex items-center justify-between">
-        <a href="/" className="flex items-center gap-2">
+        <Link href="/" className="flex items-center gap-2">
           <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-full bg-blueumbrella-700 flex items-center justify-center">
             <span className="text-white text-lg sm:text-xl font-bold">B</span>
           </div>
           <span className="text-lg sm:text-xl font-bold text-blueumbrella-800">Blue Umbrella</span>
-        </a>
+        </Link>
         
         {/* Mobile Menu Button */}
         <button
@@ -58,22 +59,22 @@ const Navigation = () => {
 
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center gap-6 lg:gap-8">
-          <a href="/#why-us" className="text-blueumbrella-800 hover:text-blueumbrella-600 transition-colors text-sm lg:text-base">
+          <Link href="/#why-us" className="text-blueumbrella-800 hover:text-blueumbrella-600 transition-colors text-sm lg:text-base">
             Why Choose Us
-          </a>
-          <a href="/#how-it-works" className="text-blueumbrella-800 hover:text-blueumbrella-600 transition-colors text-sm lg:text-base">
+          </Link>
+          <Link href="/#how-it-works" className="text-blueumbrella-800 hover:text-blueumbrella-600 transition-colors text-sm lg:text-base">
             How It Works
-          </a>
-          <a href="/#testimonials" className="text-blueumbrella-800 hover:text-blueumbrella-600 transition-colors text-sm lg:text-base">
+          </Link>
+          <Link href="/#testimonials" className="text-blueumbrella-800 hover:text-blueumbrella-600 transition-colors text-sm lg:text-base">
             Testimonials
-          </a>
-          <a href="/review">
+          </Link>
+          <Link href="/review">
             <Button 
               className="bg-blueumbrella-700 hover:bg-blueumbrella-800 text-white text-sm lg:text-base"
             >
               Get My Free AI Report
             </Button>
-          </a>
+          </Link>
         </div>
 
         {/* Mobile Navigation */}
@@ -89,28 +90,28 @@ const Navigation = () => {
             >
               <X className="h-6 w-6 text-blueumbrella-800" />
             </button>
-            <a 
+            <Link 
               href="/#why-us" 
               className="text-lg sm:text-xl text-blueumbrella-800 hover:text-blueumbrella-600 transition-colors"
               onClick={() => setIsMobileMenuOpen(false)}
             >
               Why Choose Us
-            </a>
-            <a 
+            </Link>
+            <Link 
               href="/#how-it-works" 
               className="text-lg sm:text-xl text-blueumbrella-800 hover:text-blueumbrella-600 transition-colors"
               onClick={() => setIsMobileMenuOpen(false)}
             >
               How It Works
-            </a>
-            <a 
+            </Link>
+            <Link 
               href="/#testimonials" 
               className="text-lg sm:text-xl text-blueumbrella-800 hover:text-blueumbrella-600 transition-colors"
               onClick={() => setIsMobileMenuOpen(false)}
             >
               Testimonials
-            </a>
-            <a 
+            </Link>
+            <Link 
               href="/review" 
               onClick={() => setIsMobileMenuOpen(false)}
             >
@@ -119,7 +120,7 @@ const Navigation = () => {
               >
                 Get My Free AI Report
               </Button>
-            </a>
+            </Link>
           </div>
         </div>
       </div>
