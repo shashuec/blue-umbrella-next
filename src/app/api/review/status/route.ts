@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { updateAnalysisStatus } from '@/lib/analysisStore';
+import DB from '@/lib/db';
 
 export async function GET(request: NextRequest) {
   try {
@@ -13,10 +13,10 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Use updateAnalysisStatus to ensure the analysis exists, but don't update anything
-    const analysis = updateAnalysisStatus(id, {});
+    // Get the session from database
+    const session = await DB.reviewSessions.getById(id);
 
-    if (!analysis) {
+    if (!session) {
       return NextResponse.json(
         { error: 'Analysis not found' },
         { status: 404 }
@@ -26,11 +26,12 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       success: true,
       data: {
-        id: analysis.id,
-        status: analysis.status,
-        progress: analysis.progress,
-        result: analysis.result,
-        error: analysis.error,
+        id: session.id,
+        status: session.status,
+        progress: session.progress,
+        result: session.result,
+        error: session.error,
+        updatedAt: session.updated_at
       },
     });
   } catch (error) {
@@ -54,15 +55,20 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Use updateAnalysisStatus to create or update the analysis
-    const updated = updateAnalysisStatus(id, { status, progress, result, error });
+    // Update the session in the database
+    const session = await DB.reviewSessions.update(id, {
+      status,
+      progress,
+      result,
+      error
+    });
 
     return NextResponse.json({
       success: true,
       data: {
-        id,
-        status: updated.status,
-        progress: updated.progress,
+        id: session.id,
+        status: session.status,
+        progress: session.progress,
       },
     });
   } catch (error) {

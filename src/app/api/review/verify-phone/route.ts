@@ -1,18 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-
-// In a real implementation, we would use a database
-// For this demo, we'll use the same in-memory store from the upload route
-// This should be in a shared file or database in production
-declare const uploadStore: Record<string, {
-  fileData: unknown,
-  timestamp: number,
-  phoneNumber?: string,
-  verified?: boolean,
-  status?: 'pending' | 'processing' | 'completed' | 'failed',
-  progress?: number,
-  stage?: string,
-  otp?: string
-}>;
+import DB from '@/lib/db';
+import { initTwilioClient } from '@/lib/supabase';
 
 export async function POST(request: NextRequest) {
   try {
@@ -21,13 +9,6 @@ export async function POST(request: NextRequest) {
     if (!phoneNumber) {
       return NextResponse.json(
         { error: 'Phone number is required' },
-        { status: 400 }
-      );
-    }
-    
-    if (!uploadId || !uploadStore[uploadId]) {
-      return NextResponse.json(
-        { error: 'Invalid upload ID' },
         { status: 400 }
       );
     }
@@ -41,25 +22,61 @@ export async function POST(request: NextRequest) {
       );
     }
     
+    // Check if session exists
+    const session = await DB.reviewSessions.getById(uploadId);
+    if (!session) {
+      return NextResponse.json(
+        { error: 'Invalid upload ID' },
+        { status: 400 }
+      );
+    }
+    
     // Generate a random 4-digit OTP
     const otp = Math.floor(1000 + Math.random() * 9000).toString();
     
-    // In a real app, we would send this via Twilio or similar service
-    console.log(`Sending OTP ${otp} to ${cleanPhone}`);
-    
-    // Store the phone number and OTP with the upload
-    uploadStore[uploadId] = {
-      ...uploadStore[uploadId],
-      phoneNumber: cleanPhone,
-      otp,
-      verified: false
-    };
-    
-    // Return success response
-    return NextResponse.json({
-      success: true,
-      message: 'OTP sent successfully'
-    });
+    try {
+      // Store OTP in the database
+      await DB.phoneOTPs.create(cleanPhone, uploadId, otp);
+      
+      // Send OTP via Twilio
+      if (process.env.NODE_ENV === 'production') {
+        try {
+          const twilioClient = initTwilioClient();
+          await twilioClient.messages.create({
+            body: `Your Blue Umbrella verification code is: ${otp}`,
+            from: process.env.TWILIO_PHONE_NUMBER,
+            to: `+${cleanPhone}`
+          });
+        } catch (twilioError) {
+          console.error('Twilio error:', twilioError);
+          return NextResponse.json(
+            { error: 'Failed to send SMS' },
+            { status: 500 }
+          );
+        }
+      } else {
+        // Log OTP in development environment
+        console.log(`DEV MODE: OTP for ${cleanPhone} is ${otp}`);
+      }
+      
+      // Update the session with phone number
+      await DB.reviewSessions.update(uploadId, {
+        phone_number: cleanPhone
+      });
+      
+      // Return success response
+      return NextResponse.json({
+        success: true,
+        message: 'OTP sent successfully'
+      });
+      
+    } catch (dbError) {
+      console.error('Database error:', dbError);
+      return NextResponse.json(
+        { error: 'Failed to store OTP data' },
+        { status: 500 }
+      );
+    }
     
   } catch (error) {
     console.error('Error sending OTP:', error);

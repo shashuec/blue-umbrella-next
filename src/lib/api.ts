@@ -9,7 +9,10 @@ export const API_ROUTES = {
   STATUS: '/api/review/status',
 } as const;
 
-// Upload a portfolio file
+/**
+ * Upload a portfolio file to the server
+ * Files are stored in Supabase Storage in the portfolio-uploads bucket
+ */
 export async function uploadPortfolio(file: File) {
   const formData = new FormData();
   formData.append('file', file);
@@ -27,7 +30,10 @@ export async function uploadPortfolio(file: File) {
   return response.json();
 }
 
-// Send OTP to phone number
+/**
+ * Send OTP verification code to the provided phone number
+ * OTPs are stored in Supabase and sent via Twilio
+ */
 export async function sendOTP(phoneNumber: string, uploadId: string) {
   const response = await fetch(API_ROUTES.VERIFY_PHONE, {
     method: 'POST',
@@ -45,7 +51,10 @@ export async function sendOTP(phoneNumber: string, uploadId: string) {
   return response.json();
 }
 
-// Verify OTP
+/**
+ * Verify OTP code for the provided phone number and session
+ * Verification is tracked in Supabase
+ */
 export async function verifyOTP(otp: string, uploadId: string, phoneNumber: string) {
   const response = await fetch(API_ROUTES.CONFIRM_OTP, {
     method: 'POST',
@@ -63,7 +72,10 @@ export async function verifyOTP(otp: string, uploadId: string, phoneNumber: stri
   return response.json();
 }
 
-// Start portfolio analysis process
+/**
+ * Start the portfolio analysis process
+ * Triggers the serverless function to extract PDF content and call OpenAI
+ */
 export async function startAnalysis(uploadId: string) {
   const response = await fetch(API_ROUTES.PROCESS, {
     method: 'POST',
@@ -81,7 +93,10 @@ export async function startAnalysis(uploadId: string) {
   return response.json();
 }
 
-// Check analysis status
+/**
+ * Check the status of an ongoing analysis
+ * Fetches the current state from Supabase
+ */
 export async function checkAnalysisStatus(analysisId: string): Promise<ApiResponse<AnalysisData>> {
   const response = await fetch(`${API_ROUTES.STATUS}?id=${analysisId}`);
 

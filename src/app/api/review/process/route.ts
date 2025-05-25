@@ -1,35 +1,35 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { updateAnalysisStatus } from '@/lib/analysisStore';
 import { v4 as uuidv4 } from 'uuid';
+import DB from '@/lib/db';
+import { supabaseStorage, isTestMode } from '@/lib/supabase';
+import { getAIClient } from '@/lib/ai-client';
+import pdfParse from 'pdf-parse';
 
-// In a real implementation, we would use a database
-// For this demo, we'll use the same in-memory store from the upload route
-// This should be in a shared file or database in production
-declare const uploadStore: Record<string, {
-  fileData: unknown,
-  timestamp: number,
-  phoneNumber?: string,
-  verified?: boolean,
-  status?: 'pending' | 'processing' | 'completed' | 'failed',
-  progress?: number,
-  stage?: string,
-  otp?: string,
-  analysisId?: string,
-  insights?: {
-    summary: string,
-    currentValue: number,
-    annualReturn: number,
-    riskLevel: string,
-    assetCount: number,
-    recommendations: string[],
-    allocation: {
-      equity: number,
-      debt: number,
-      gold: number,
-      others: number
-    }
+// PDF processing function
+async function processPdfContent(pdfBuffer: Buffer): Promise<string> {
+  try {
+    const data = await pdfParse(pdfBuffer);
+    return data.text;
+  } catch (error) {
+    console.error('Error parsing PDF:', error);
+    throw new Error('Failed to parse PDF content');
   }
-}>;
+}
+
+// Portfolio analysis function with AI client
+async function analyzePortfolio(pdfText: string) {
+  try {
+    // Get AI client (Azure OpenAI or mock)
+    const aiClient = await getAIClient();
+    
+    // Analyze portfolio using AI
+    console.log('Analyzing portfolio text...');
+    return await aiClient.analyzePortfolio(pdfText);
+  } catch (error) {
+    console.error('Error analyzing portfolio:', error);
+    throw new Error('Failed to analyze portfolio');
+  }
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -42,114 +42,99 @@ export async function POST(request: NextRequest) {
       );
     }
     
-    const uploadData = uploadStore[uploadId];
+    // Check if the session exists
+    const session = await DB.reviewSessions.getById(uploadId);
     
-    if (!uploadData) {
+    if (!session) {
       return NextResponse.json(
         { error: 'Invalid upload ID' },
         { status: 400 }
       );
     }
     
-    // Check if the phone number is verified
-    if (!uploadData.verified) {
-      return NextResponse.json(
-        { error: 'Phone number not verified' },
-        { status: 400 }
-      );
+    // NOTE: OTP verification requirement removed temporarily
+    // Auto-mark as verified if not already verified
+    if (!session.phone_verified) {
+      console.log('Auto-verifying session without OTP check');
+      await DB.reviewSessions.update(uploadId, {
+        phone_verified: true
+      });
     }
     
-    // Create an analysis ID
-    const analysisId = uuidv4();
+    // Create an analysis ID (can use the same ID as the session)
+    const analysisId = uploadId;
     
-    // Start processing
-    uploadStore[uploadId] = {
-      ...uploadData,
+    // Update the session status to processing
+    await DB.reviewSessions.update(uploadId, {
       status: 'processing',
-      progress: 0,
-      stage: 'parsing',
-      analysisId
-    };
-    
-    // Initialize the analysis status
-    updateAnalysisStatus(analysisId, {
-      status: 'processing',
-      progress: 0
+      progress: 10,
+      stage: 'parsing'
     });
     
-    // In a real app, we would call OpenAI or other AI service for processing
-    // For this demo, we'll simulate processing with a timeout
+    // This would be handled by a background job in production
+    // For demo purposes, we're doing it in the request handler (not recommended for production)
     
-    // This would be a background job in a real app
-    // We're simulating here with a setTimeout (not good for production)
-    setTimeout(() => {
-      // Simulate parsing stage (30% of progress)
-      const analysisId = uploadStore[uploadId].analysisId!;
-      updateAnalysisStatus(analysisId, {
-        status: 'processing',
-        progress: 30,
-        result: { stage: 'parsing' }
-      });
-      
-      setTimeout(() => {
-        // Simulate analyzing stage (60% of progress)
-        updateAnalysisStatus(analysisId, {
-          status: 'processing',
-          progress: 60,
-          result: { stage: 'analyzing' }
-        });
-        
-        setTimeout(() => {
-          // Simulate generating stage (90% of progress)
-          updateAnalysisStatus(analysisId, {
-            status: 'processing',
-            progress: 90,
-            result: { stage: 'generating' }
+    // Start an async process without waiting for it to complete
+    (async () => {
+      try {
+        // Step 1: Download the file
+        try {
+          // Update progress
+          await DB.reviewSessions.update(uploadId, {
+            progress: 30,
+            stage: 'parsing'
           });
           
-          setTimeout(() => {
-            // Add sample insights data
-            const insights = {
-              summary: "Your portfolio shows a balanced approach with moderate risk. There's room for improvement in diversification and potential for higher returns with some adjustments.",
-              currentValue: 1250000,
-              annualReturn: 11.5,
-              riskLevel: "Moderate",
-              assetCount: 8,
-              recommendations: [
-                "Consider increasing equity allocation by 10% to improve long-term returns",
-                "Rebalance debt funds to reduce duration risk in rising interest rate environment",
-                "Add international exposure (5-10%) to improve diversification",
-                "Consolidate similar funds to reduce overlap and management fees"
-              ],
-              allocation: {
-                equity: 45,
-                debt: 40,
-                gold: 10,
-                others: 5
-              }
-            };
-            
-            // Complete processing
-            updateAnalysisStatus(analysisId, {
-              status: 'completed',
-              progress: 100,
-              result: { insights }
-            });
-            
-            // Update upload store as well
-            uploadStore[uploadId].insights = insights;
-            uploadStore[uploadId].status = 'completed';
-            uploadStore[uploadId].progress = 100;
-          }, 3000);
-        }, 3000);
-      }, 3000);
-    }, 1000);
+          // Download the PDF from Supabase Storage
+          const pdfBlob = await supabaseStorage.downloadFile(session.upload_path);
+          const pdfBuffer = Buffer.from(await pdfBlob.arrayBuffer());
+          
+          // Step 2: Parse the PDF
+          const pdfText = await processPdfContent(pdfBuffer);
+          
+          // Update progress
+          await DB.reviewSessions.update(uploadId, {
+            progress: 50,
+            stage: 'analyzing'
+          });
+          
+          // Step 3: Analyze with OpenAI
+          const insights = await analyzePortfolio(pdfText);
+          
+          // Update progress
+          await DB.reviewSessions.update(uploadId, {
+            progress: 90,
+            stage: 'generating'
+          });
+          
+          // Step 4: Save the results
+          await DB.reviewSessions.update(uploadId, {
+            status: 'completed',
+            progress: 100,
+            result: insights
+          });
+          
+        } catch (downloadError) {
+          console.error('Error downloading or processing file:', downloadError);
+          await DB.reviewSessions.update(uploadId, {
+            status: 'failed',
+            error: 'Failed to process portfolio file'
+          });
+        }
+      } catch (processError) {
+        console.error('Process error:', processError);
+        await DB.reviewSessions.update(uploadId, {
+          status: 'failed',
+          error: 'Analysis process failed'
+        });
+      }
+    })();
     
     // Return immediate success response with analysis ID
     return NextResponse.json({
       success: true,
       message: 'Processing started',
-      analysisId: uploadStore[uploadId].analysisId
+      analysisId
     });
     
   } catch (error) {

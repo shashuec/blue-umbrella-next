@@ -29,9 +29,18 @@ const ReviewPage = () => {
   const [insights, setInsights] = useState<PortfolioAnalysis | null>(null);
   
   // Handler for successful file upload
-  const handleFileUploaded = (id: string) => {
+  const handleFileUploaded = async (id: string) => {
     setUploadId(id);
-    setStep(STEPS.PHONE);
+    // Skip phone verification and start analysis directly
+    try {
+      toast.info("Starting portfolio analysis...");
+      const result = await startAnalysis(id);
+      setAnalysisId(result.analysisId);
+      setStep(STEPS.PROCESSING);
+    } catch (error) {
+      console.error("Error starting analysis:", error);
+      toast.error("Failed to start analysis");
+    }
   };
   
   // Handler for phone verification
@@ -83,22 +92,7 @@ const ReviewPage = () => {
                 <FileUploadStep onFileUploaded={handleFileUploaded} />
               )}
               
-              {step === STEPS.PHONE && (
-                <PhoneVerificationStep 
-                  uploadId={uploadId!}
-                  onPhoneVerified={handlePhoneVerified}
-                  onBack={() => setStep(STEPS.UPLOAD)}
-                />
-              )}
-              
-              {step === STEPS.OTP && (
-                <OTPInputStep
-                  phoneNumber={phoneNumber}
-                  uploadId={uploadId!}
-                  onOTPVerified={handleOTPVerified}
-                  onBack={() => setStep(STEPS.PHONE)}
-                />
-              )}
+              {/* Phone and OTP steps are skipped - verification requirement removed */}
               
               {step === STEPS.PROCESSING && analysisId && (
                 <InsightsProgress
